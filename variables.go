@@ -20,8 +20,8 @@ type Variables struct {
 	Expander Expander
 }
 
-// initialize variables
-func (vars *Variables) init() error {
+// Init initialize new variables struct
+func (vars *Variables) Init() error {
 	// load template function helpers
 	if err := vars.Expander.Init(); err != nil {
 		return err
@@ -30,7 +30,7 @@ func (vars *Variables) init() error {
 	// set initial map
 	vars.Expander.Variables = make(map[string]interface{})
 	for _, variable := range vars.List {
-		if err := vars.set(variable, false); err != nil {
+		if err := vars.Set(variable, false); err != nil {
 			log.Fatal("variables", fmt.Sprintf("failed to set '%s': %v", variable.Key, err))
 		}
 	}
@@ -38,11 +38,11 @@ func (vars *Variables) init() error {
 	return nil
 }
 
-// set both environment and variable values
-func (vars *Variables) set(variable Variable, overwrite bool) error {
+// Set both environment and variable values for use with template expansion
+func (vars *Variables) Set(variable Variable, overwrite bool) error {
 	key := variable.Key
 
-	val, err := vars.resolve(variable, overwrite)
+	val, err := vars.Resolve(variable, overwrite)
 	if err != nil {
 		return err
 	}
@@ -53,8 +53,8 @@ func (vars *Variables) set(variable Variable, overwrite bool) error {
 	return nil
 }
 
-// resolve variables
-func (vars *Variables) resolve(variable Variable, overwrite bool) (val string, err error) {
+// Resolve variable values
+func (vars *Variables) Resolve(variable Variable, overwrite bool) (val string, err error) {
 	reEx := regexp.MustCompile(`^exec\((.*)\)$`)
 	// environment
 	if env := os.Getenv(variable.Key); env != "" && !overwrite {
