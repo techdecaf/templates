@@ -24,11 +24,12 @@ func exists(path string) error {
 
 // CommandOptions - new command runner
 type CommandOptions struct {
-	Name      string
-	Cmd       string
-	Dir       string
-	Env       []string
-	UseStdOut bool
+	Name       string
+	Cmd        string
+	Dir        string
+	Env        []string
+	UseStdOut  bool
+	TrimOutput bool
 }
 
 // Run - run command
@@ -78,7 +79,13 @@ func Run(cmd CommandOptions) (val string, err error) {
 		return "", err
 	}
 
-	return buff.String(), err
+	output := buff.String()
+
+	if cmd.TrimOutput {
+		output = strings.TrimSpace(output)
+	}
+
+	return output, err
 }
 
 // func checkInstall(next interp.ExecModule) interp.ExecModule {
