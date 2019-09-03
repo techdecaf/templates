@@ -32,14 +32,14 @@ func (funcs *Functions) init() error {
 			return strings.Split(strings.Replace(s, "\r\n", "\n", -1), "\n")
 		},
 		"EXEC": func(cmd string) string {
-			val, err := Run(CommandOptions{
+			out, err := Run(CommandOptions{
 				Cmd:       cmd,
 				UseStdOut: false,
 			})
 			if err != nil {
 				log.Fatal(err)
 			}
-			return val
+			return strings.TrimSpace(out)
 		},
 		"FromSlash": filepath.FromSlash,
 		"ToSlash":   filepath.ToSlash,
