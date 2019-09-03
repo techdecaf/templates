@@ -2,6 +2,7 @@ package templates
 
 import (
 	"io/ioutil"
+	"log"
 	"os"
 	"path"
 	"path/filepath"
@@ -30,7 +31,16 @@ func (funcs *Functions) init() error {
 		"SplitLines": func(s string) []string {
 			return strings.Split(strings.Replace(s, "\r\n", "\n", -1), "\n")
 		},
-		// "EXEC":      exec,
+		"EXEC": func(cmd string) string {
+			val, err := Run(CommandOptions{
+				Cmd:       cmd,
+				UseStdOut: false,
+			})
+			if err != nil {
+				log.Fatal(err)
+			}
+			return val
+		},
 		"FromSlash": filepath.FromSlash,
 		"ToSlash":   filepath.ToSlash,
 		"ToTitle":   strings.Title,
