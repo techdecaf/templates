@@ -13,6 +13,11 @@ var (
 		Value: "{{EXEC `echo hello_world`}}",
 	}
 
+	ShouldTryVar = Variable{
+		Key:   "TRY_VAR",
+		Value: "{{TRY `fails hello` | default `failed`}}",
+	}
+
 	ShouldOverrideVar = Variable{
 		Key:         "OVERRIDE_VAR",
 		Value:       "overwritten",
@@ -45,6 +50,20 @@ func TestTemplateExpansion(t *testing.T) {
 	}
 
 	test(t, want, os.Getenv(ShouldExecVar.Key))
+}
+
+func TestTryFunc(t *testing.T) {
+	want := "failed"
+
+	if err := vars.Init(); err != nil {
+		t.Errorf("failed to init vars %v", err)
+	}
+
+	if err := vars.Set(ShouldTryVar); err != nil {
+		t.Errorf("failed to set testVar %v", err)
+	}
+
+	test(t, want, os.Getenv(ShouldTryVar.Key))
 }
 
 func TestEnvResolution(t *testing.T) {

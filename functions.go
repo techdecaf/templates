@@ -44,6 +44,19 @@ func (funcs *Functions) init() error {
 
 			return output
 		},
+		"TRY": func(cmd string) string {
+			output, err := Run(CommandOptions{
+				Cmd:        cmd,
+				UseStdOut:  false,
+				TrimOutput: true,
+			})
+
+			if err != nil {
+				return ""
+			}
+
+			return output
+		},
 		"FromSlash": filepath.FromSlash,
 		"ToSlash":   filepath.ToSlash,
 		"ToTitle":   strings.Title,
