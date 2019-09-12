@@ -3,11 +3,13 @@ package templates
 import (
 	"fmt"
 	"os"
+	"strings"
 	"testing"
 )
 
+var vars = Variables{}
+
 var (
-	vars          = Variables{}
 	ShouldExecVar = Variable{
 		Key:   "EXEC_VAR",
 		Value: "{{EXEC `echo hello_world`}}",
@@ -15,7 +17,7 @@ var (
 
 	ShouldTryVar = Variable{
 		Key:   "TRY_VAR",
-		Value: "{{TRY `fails hello` | default `failed`}}",
+		Value: "{{TRY `fails hello` | default `default`}}",
 	}
 
 	ShouldOverrideVar = Variable{
@@ -28,13 +30,21 @@ var (
 		Key:   "OVERRIDE_VAR",
 		Value: "does_not_overwrite",
 	}
+
+	FooVar = Variable{
+		Key:   "BAR",
+		Value: "bar",
+	}
 )
 
 func test(t *testing.T, want, got interface{}) {
 	if got != want {
 		t.Errorf("%v() = %q, want %q", t.Name(), got, want)
 	} else {
-		fmt.Printf("[TEST][PASSED][%s][got = %v]\n", t.Name(), got)
+		fmt.Printf("[TEST][PASSED][%s]\n", t.Name())
+		fmt.Printf("[want = %v]\n", want)
+		fmt.Printf("[got  = %v]\n", got)
+		fmt.Println()
 	}
 }
 
@@ -53,7 +63,7 @@ func TestTemplateExpansion(t *testing.T) {
 }
 
 func TestTryFunc(t *testing.T) {
-	want := "failed"
+	want := "default"
 
 	if err := vars.Init(); err != nil {
 		t.Errorf("failed to init vars %v", err)
@@ -94,4 +104,20 @@ func TestEnvResolution(t *testing.T) {
 
 	// should not be overwritten
 	test(t, ShouldOverrideVar.Value, os.Getenv(ShouldNotOverrideVar.Key))
+}
+
+// EXPANDING A FILE
+func TestFileExpansion(t *testing.T) {
+	want := "FOO=BAR,FOO=BAR"
+
+	if err := vars.Set(FooVar); err != nil {
+		t.Errorf("failed to set testVar %v", err)
+	}
+
+	got, err := vars.Expander.ExpandFile("tests/testfile.txt")
+	if err != nil {
+		t.Errorf("failed to expand file %v", err)
+	}
+
+	test(t, want, strings.Replace(got, "\n", ",", -1))
 }

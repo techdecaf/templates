@@ -34,6 +34,11 @@ func (vars *Variables) Init() error {
 		}
 	}
 
+	vars.Expander.Functions.Add("Expand", func(str string) string {
+		out, _ := vars.Expander.Expand(str)
+		return out
+	})
+
 	return nil
 }
 
@@ -54,24 +59,9 @@ func (vars *Variables) Set(v Variable) error {
 
 // Resolve variable values
 func (vars *Variables) Resolve(v Variable) (val string, err error) {
-	// reEx := regexp.MustCompile(`^exec\((.*)\)$`)
-	// environment
 	if env := os.Getenv(v.Key); env != "" && !v.OverrideEnv {
 		return env, err
 	}
-
-	// // script values
-	// expanded, err := vars.Expander.Expand(v.Value)
-	// if err != nil {
-	// 	return "", err
-	// }
-
-	// if cmd := reEx.FindStringSubmatch(expanded); len(cmd) != 0 {
-	// 	return Run(CommandOptions{
-	// 		Cmd:       cmd[1],
-	// 		UseStdOut: false,
-	// 	})
-	// }
 
 	// default value
 	return vars.Expander.Expand(v.Value)
