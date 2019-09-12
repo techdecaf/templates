@@ -34,7 +34,7 @@ func EnvMap() map[string]interface{} {
 
 	for _, v := range os.Environ() {
 		s := strings.Split(v, "=")
-		env[s[0]] = s[1]
+		env[s[0]] = s[1:]
 	}
 
 	return env
