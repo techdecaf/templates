@@ -18,8 +18,14 @@ func PathTo(file string) string {
 }
 
 // WriteFile and return as a string
-func WriteFile(data, file string) error {
-	return ioutil.WriteFile(PathTo(file), []byte(data), 0700)
+func WriteFile(file, data string) error {
+	_path := PathTo(file)
+	// try to create file
+	if _, err := os.Create(_path); err != nil {
+		return err
+	}
+
+	return ioutil.WriteFile(_path, []byte(data), 0700)
 }
 
 // EnvMap is a converts the env to a map fo string[string]

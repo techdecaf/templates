@@ -45,9 +45,7 @@ func (funcs *Functions) init() error {
 		return string(data)
 	})
 
-	funcs.Add("WriteFile", func(data, file string) error {
-		return ioutil.WriteFile(internal.PathTo(file), []byte(data), 0700)
-	})
+	funcs.Add("WriteFile", internal.WriteFile)
 
 	funcs.Add("MkdirAll", func(file string) (err error) {
 		err = os.MkdirAll(internal.PathTo(file), 0700)
