@@ -87,6 +87,16 @@ func (funcs *Functions) init() error {
 		return output
 	})
 
+	funcs.Add("ExpandString", func(str string) string {
+		out, _ := Expand(str, *funcs)
+		return out
+	})
+
+	funcs.Add("ExpandFile", func(file string) string {
+		out, _ := ExpandFile(file, *funcs)
+		return out
+	})
+
 	return nil
 }
 
