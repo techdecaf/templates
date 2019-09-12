@@ -15,32 +15,30 @@ type Variable struct {
 
 // Variables struct
 type Variables struct {
-	List     []Variable
-	Expander Expander
+	List      []Variable
+	Functions Functions
 }
 
 // Init initialize new variables struct
 func (vars *Variables) Init() error {
 	// load template function helpers
-	if err := vars.Expander.Init(); err != nil {
+	if err := vars.Functions.init(); err != nil {
 		return err
 	}
 
-	// set initial map
-	vars.Expander.Variables = make(map[string]interface{})
 	for _, variable := range vars.List {
 		if err := vars.Set(variable); err != nil {
-			log.Fatal("variables", fmt.Sprintf("failed to set '%s': %v", variable.Key, err))
+			log.Fatal("variables", fmt.Sprintf("failed to set '%s': %v\n", variable.Key, err))
 		}
 	}
 
-	vars.Expander.Functions.Add("ExpandString", func(str string) string {
-		out, _ := vars.Expander.Expand(str)
+	vars.Functions.Add("ExpandString", func(str string) string {
+		out, _ := Expand(str, vars.Functions)
 		return out
 	})
 
-	vars.Expander.Functions.Add("ExpandFile", func(file string) string {
-		out, _ := vars.Expander.ExpandFile(file)
+	vars.Functions.Add("ExpandFile", func(file string) string {
+		out, _ := ExpandFile(file, vars.Functions)
 		return out
 	})
 
@@ -49,16 +47,16 @@ func (vars *Variables) Init() error {
 
 // Set both environment and variable values for use with template expansion
 func (vars *Variables) Set(v Variable) error {
-	key := v.Key
 
 	val, err := vars.Resolve(v)
 	if err != nil {
 		return err
 	}
 
-	if err := vars.Expander.SetVariable(key, val); err != nil {
+	if err := os.Setenv(v.Key, val); err != nil {
 		return err
 	}
+
 	return nil
 }
 
@@ -69,6 +67,6 @@ func (vars *Variables) Resolve(v Variable) (val string, err error) {
 	}
 
 	// default value
-	return vars.Expander.Expand(v.Value)
+	return Expand(v.Value, vars.Functions)
 
 }

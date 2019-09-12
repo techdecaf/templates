@@ -114,7 +114,7 @@ func TestFileExpansion(t *testing.T) {
 		t.Errorf("failed to set testVar %v", err)
 	}
 
-	got, err := vars.Expander.ExpandFile("tests/testfile.txt")
+	got, err := ExpandFile("tests/testfile.txt", vars.Functions)
 	if err != nil {
 		t.Errorf("failed to expand file %v", err)
 	}
