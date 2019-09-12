@@ -34,8 +34,13 @@ func (vars *Variables) Init() error {
 		}
 	}
 
-	vars.Expander.Functions.Add("Expand", func(str string) string {
+	vars.Expander.Functions.Add("ExpandString", func(str string) string {
 		out, _ := vars.Expander.Expand(str)
+		return out
+	})
+
+	vars.Expander.Functions.Add("ExpandFile", func(file string) string {
+		out, _ := vars.Expander.ExpandFile(file)
 		return out
 	})
 
