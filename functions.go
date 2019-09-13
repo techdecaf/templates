@@ -86,7 +86,7 @@ func (funcs *Functions) Init() error {
 		return output
 	})
 
-	funcs.Add("ExpandString", func(str string) string {
+	funcs.Add("Expand", func(str string) string {
 		out, _ := Expand(str, *funcs)
 		return out
 	})
