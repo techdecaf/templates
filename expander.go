@@ -2,7 +2,6 @@ package templates
 
 import (
 	"bytes"
-	"fmt"
 	"path"
 	"text/template"
 
@@ -32,14 +31,14 @@ func Expand(str string, fn Functions) (string, error) {
 func ExpandFile(file string, fn Functions) (string, error) {
 	var output bytes.Buffer
 	var input = internal.PathTo(file)
-	fmt.Println(input)
 
 	fileTemplate, err := template.New(path.Base(input)).Funcs(fn.Map).ParseFiles(input)
 	if err != nil {
 		return "", err
 	}
 
-	if err := fileTemplate.Execute(&output, internal.EnvMap()); err != nil {
+	env := internal.EnvMap()
+	if err := fileTemplate.Execute(&output, env); err != nil {
 		return "", err
 	}
 
