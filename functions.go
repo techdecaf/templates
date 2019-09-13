@@ -18,7 +18,8 @@ type Functions struct {
 	Map template.FuncMap
 }
 
-func (funcs *Functions) init() error {
+// Init adds all default functions to the Map
+func (funcs *Functions) Init() error {
 	funcs.Map = sprig.TxtFuncMap()
 
 	funcs.Add("OS", func() string { return runtime.GOOS })

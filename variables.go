@@ -22,7 +22,7 @@ type Variables struct {
 // Init initialize new variables struct
 func (vars *Variables) Init() error {
 	// load template function helpers
-	if err := vars.Functions.init(); err != nil {
+	if err := vars.Functions.Init(); err != nil {
 		return err
 	}
 
