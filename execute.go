@@ -5,9 +5,9 @@ import (
 	"context"
 	"io"
 	"os"
-	"path"
 	"strings"
 
+	"github.com/techdecaf/templates/internal"
 	"mvdan.cc/sh/interp"
 	"mvdan.cc/sh/shell"
 	"mvdan.cc/sh/syntax"
@@ -46,9 +46,7 @@ func Run(cmd CommandOptions) (val string, err error) {
 	}
 
 	// set working directory
-	pwd, _ := os.Getwd()
-	cmd.Dir = path.Join(pwd, cmd.Dir)
-
+	cmd.Dir = internal.PathTo(cmd.Dir)
 	if err := exists(cmd.Dir); err != nil {
 		return "", err
 	}

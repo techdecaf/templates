@@ -1,2 +1,2 @@
 {{list "foo=" .BAR | join "" | ToUpper }}
-{{ExpandString "echo foo=$BAR" | EXEC | ToUpper}}
+{{Expand "echo foo=$BAR" | EXEC | ToUpper}}
