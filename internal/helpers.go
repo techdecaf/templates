@@ -14,7 +14,7 @@ func PathTo(file string) string {
 		return file
 	}
 	pwd, _ := os.Getwd()
-	return path.Join(pwd, file)
+	return filepath.Clean(path.Join(pwd, file))
 }
 
 // WriteFile and return as a string
