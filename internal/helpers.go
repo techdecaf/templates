@@ -3,7 +3,6 @@ package internal
 import (
 	"io/ioutil"
 	"os"
-	"path"
 	"path/filepath"
 	"strings"
 )
@@ -14,7 +13,7 @@ func PathTo(file string) string {
 		return file
 	}
 	pwd, _ := os.Getwd()
-	return filepath.Clean(path.Join(pwd, file))
+	return filepath.Join(pwd, file)
 }
 
 // WriteFile and return as a string

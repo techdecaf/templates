@@ -31,8 +31,10 @@ func Expand(str string, fn Functions) (string, error) {
 func ExpandFile(file string, fn Functions) (string, error) {
 	var output bytes.Buffer
 	var input = internal.PathTo(file)
+	var templatePath = filepath.Base(input)
+	
+	fileTemplate, err := template.New(templatePath).Funcs(fn.Map).ParseFiles(input)
 
-	fileTemplate, err := template.New(path.Base(input)).Funcs(fn.Map).ParseFiles(input)
 	if err != nil {
 		return "", err
 	}
