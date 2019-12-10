@@ -2,7 +2,7 @@ package templates
 
 import (
 	"bytes"
-	"path"
+	"path/filepath"
 	"text/template"
 
 	"github.com/techdecaf/templates/internal"
