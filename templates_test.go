@@ -1,142 +1,111 @@
 package templates
 
 import (
-	"fmt"
 	"os"
-	"strings"
 	"testing"
 
-	"github.com/techdecaf/templates/internal"
+	. "github.com/franela/goblin"
 )
 
-var vars = Variables{}
 
-var (
-	ShouldExecVar = Variable{
-		Key:   "EXEC_VAR",
-		Value: "{{EXEC `echo hello_world`}}",
-	}
+func TestVariables(t *testing.T){
+  test := Goblin(t)
 
-	ShouldTryVar = Variable{
-		Key:   "TRY_VAR",
-		Value: "{{TRY `fails hello` | default `default`}}",
-	}
+  test.Describe("given: a developer needs to set template variables", func(){
+    test.Describe("when: a variable already exists in the environment", func(){
+      test.It("then: the value should not be overwritten", func(){
+        variables := Variables{}
+        variables.Init()
+        shouldNotOverride := Variable{
+          Key: "TEST_OVERRIDE_VAR",
+          Value: "should_not_overwrite",
+        }
+        os.Setenv(shouldNotOverride.Key, "set_in_env")
+        variables.Set(shouldNotOverride)
+        // assert
+        test.Assert(os.Getenv("TEST_OVERRIDE_VAR")).Equal("set_in_env")	
+      })
+    })
 
-	ShouldOverrideVar = Variable{
-		Key:         "OVERRIDE_VAR",
-		Value:       "overwritten",
-		OverrideEnv: true,
-	}
+    test.Describe("when: a an explicit override value is set", func(){
+      test.It("then: the value should replace what is currently in the env", func(){
+        variables := Variables{}
+        variables.Init()
+        shouldNotOverride := Variable{
+          Key: "TEST_OVERRIDE_VAR",
+          Value: "should_overwrite",
+          OverrideEnv: true,
+        }
+        os.Setenv(shouldNotOverride.Key, "set_in_env")
+        variables.Set(shouldNotOverride)
+        // assert
+        test.Assert(os.Getenv("TEST_OVERRIDE_VAR")).Equal("should_overwrite")	
+      })
+    })
 
-	ShouldNotOverrideVar = Variable{
-		Key:   "OVERRIDE_VAR",
-		Value: "does_not_overwrite",
-	}
-)
+    test.Describe("when: expansion variables are set", func(){
+      test.It("then: it should expand variables using EXEC template function", func(){
+        variables := Variables{}
+        variables.Init()
+        variables.Set(Variable{
+          Key: "TEST_EXEC_VAR",
+          Value: "{{EXEC `echo go_test`}}",
+        })
+        // assert
+        test.Assert(os.Getenv("TEST_EXEC_VAR")).Equal("go_test")
+      })
 
-func test(t *testing.T, want, got interface{}) {
-	if got != want {
-		t.Errorf("%v() = %q, want %q", t.Name(), got, want)
-	} else {
-		fmt.Printf("[TEST][PASSED][%s]\n", t.Name())
-		fmt.Printf("[want = %v]\n", want)
-		fmt.Printf("[got  = %v]\n", got)
-		fmt.Println()
-	}
-}
+      test.It("then: it should expand variables using TRY template function", func(){
+        variables := Variables{}
+        variables.Init()
+        variables.Set(Variable{
+          Key: "TEST_TRY_VAR",
+          Value: "{{TRY `fails hello` | default `default_value`}}",
+        })
+        // assert
+        test.Assert(os.Getenv("TEST_TRY_VAR")).Equal("default_value")
+      })
+    })
+  })
+  
+};
 
-func TestTemplateExpansion(t *testing.T) {
-	want := "hello_world"
 
-	if err := vars.Init(); err != nil {
-		t.Errorf("failed to init vars %v", err)
-	}
 
-	if err := vars.Set(ShouldExecVar); err != nil {
-		t.Errorf("failed to set testVar %v", err)
-	}
+// // EXPANDING A FILE
+// func TestFileExpansion(t *testing.T) {
+// 	want := "FOO=BAR,FOO=BAR"
+// 	var FooVar = Variable{
+// 		Key:   "BAR",
+// 		Value: "bar",
+// 	}
 
-	test(t, want, os.Getenv(ShouldExecVar.Key))
-}
+// 	if err := vars.Set(FooVar); err != nil {
+// 		t.Errorf("failed to set testVar %v", err)
+// 	}
 
-func TestTryFunc(t *testing.T) {
-	want := "default"
+// 	got, err := ExpandFile("tests/testfile.txt", vars.Functions)
+// 	if err != nil {
+// 		t.Errorf("failed to expand file %v", err)
+// 	}
 
-	if err := vars.Init(); err != nil {
-		t.Errorf("failed to init vars %v", err)
-	}
+// 	test(t, want, strings.Replace(got, "\n", ",", -1))
+// }
 
-	if err := vars.Set(ShouldTryVar); err != nil {
-		t.Errorf("failed to set testVar %v", err)
-	}
+// // HELPER FUNCTIONS
+// func TestEnv2Map(t *testing.T) {
+// 	want := "FOO=BAR"
+// 	FooVar := Variable{
+// 		Key:         "BAR",
+// 		Value:       "FOO=BAR",
+// 		OverrideEnv: true,
+// 	}
 
-	test(t, want, os.Getenv(ShouldTryVar.Key))
-}
+// 	if err := vars.Set(FooVar); err != nil {
+// 		t.Errorf("failed to set testVar %v", err)
+// 	}
 
-func TestEnvResolution(t *testing.T) {
-	if err := vars.Init(); err != nil {
-		t.Errorf("failed to init vars %v", err)
-	}
+// 	env := internal.EnvMap()
 
-	// set new env variable
-	if err := vars.Set(ShouldNotOverrideVar); err != nil {
-		t.Errorf("failed to set testVar %v", err)
-	}
-
-	// validate set
-	test(t, ShouldNotOverrideVar.Value, os.Getenv(ShouldNotOverrideVar.Key))
-
-	// override variable
-	if err := vars.Set(ShouldOverrideVar); err != nil {
-		t.Errorf("failed to set testVar %v", err)
-	}
-
-	// ensure overwritten
-	test(t, ShouldOverrideVar.Value, os.Getenv(ShouldNotOverrideVar.Key))
-
-	// set non overriding variable again
-	if err := vars.Set(ShouldNotOverrideVar); err != nil {
-		t.Errorf("failed to set testVar %v", err)
-	}
-
-	// should not be overwritten
-	test(t, ShouldOverrideVar.Value, os.Getenv(ShouldNotOverrideVar.Key))
-}
-
-// EXPANDING A FILE
-func TestFileExpansion(t *testing.T) {
-	want := "FOO=BAR,FOO=BAR"
-	var FooVar = Variable{
-		Key:   "BAR",
-		Value: "bar",
-	}
-
-	if err := vars.Set(FooVar); err != nil {
-		t.Errorf("failed to set testVar %v", err)
-	}
-
-	got, err := ExpandFile("tests/testfile.txt", vars.Functions)
-	if err != nil {
-		t.Errorf("failed to expand file %v", err)
-	}
-
-	test(t, want, strings.Replace(got, "\n", ",", -1))
-}
-
-// HELPER FUNCTIONS
-func TestEnv2Map(t *testing.T) {
-	want := "FOO=BAR"
-	FooVar := Variable{
-		Key:         "BAR",
-		Value:       "FOO=BAR",
-		OverrideEnv: true,
-	}
-
-	if err := vars.Set(FooVar); err != nil {
-		t.Errorf("failed to set testVar %v", err)
-	}
-
-	env := internal.EnvMap()
-
-	test(t, want, env[FooVar.Key])
-}
+// 	test(t, want, env[FooVar.Key])
+// }
