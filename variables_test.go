@@ -2,6 +2,7 @@ package templates
 
 import (
 	"os"
+	"strings"
 	"testing"
 
 	. "github.com/franela/goblin"
@@ -65,9 +66,26 @@ func TestVariables(t *testing.T){
         // assert
         test.Assert(os.Getenv("TEST_TRY_VAR")).Equal("default_value")
       })
+
+      test.It("then: it should expand variables in files", func(){
+        variables := Variables{}
+        variables.Init()
+        variables.Set(Variable{
+          Key:   "BAR",
+          Value: "bar",
+        })
+
+        // act
+        got, err := ExpandFile("tests/testfile.txt", variables.Functions)
+        if err != nil {
+          t.Errorf("failed to expand file %v", err)
+        }
+
+        // assert
+        test.Assert(strings.Replace(got, "\n", ",", -1)).Equal("FOO=BAR,FOO=BAR")
+      })
     })
   })
-  
 };
 
 

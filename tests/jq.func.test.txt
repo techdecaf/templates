@@ -1,0 +1,3 @@
+{{ReadFile `./tests/test.file.json` | JQ `.name`}}
+{{ReadFile `./tests/test.file.json` | JQ `.nested.key`}}
+{{ReadFile `./tests/test.file.json` | JQ `.array[0].foo`}}

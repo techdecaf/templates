@@ -1,40 +1,71 @@
-
+# this file is managed by a cgen template (typescript-project)
 # documentation for tasks can be found @ https://github.com/techdecaf/tasks
+
 options:
   log: true
 
 variables:
-  CI_PROJECT_NAME: unset
-  CI_COMMIT_TAG: "{{EXEC `git describe --tags --always --dirty --abbrev=0`}}"
-  CI_COMMIT_REF_NAME: "{{EXEC `git rev-parse --abbrev-ref HEAD`}}"
-  CI_COMMIT_SHA: "{{EXEC `git rev-parse HEAD`}}"
+  CI_PROJECT_NAME: "templates"
+  CI_COMMIT_TAG: "{{TRY `git describe --tags --always --abbrev=0`}}"
+  CI_COMMIT_REF_NAME: "{{TRY `git rev-parse --abbrev-ref HEAD`}}"
+  CI_COMMIT_SHA: "{{TRY `git rev-parse HEAD`}}"
 
 tasks:
   default:
-    description: is the task that runs when no tasks have been specified.
+    description: is the task that runs when no tasks have been specified. `tasks run` == `tasks run default`
     commands: [tasks list]
-
-  dependencies:
-    description: install all required dependencies
-    commands: []
-
-  build:
-    description: build current project
-    pre: [clean, dependencies]
-    commands: []
 
   clean:
     description: remove files created as part of the build step.
+    commands: [rm -rf coverage.out build]
+
+  dependencies:
+    description: install all required dependencies
+    commands: [go get, go install]
+
+  build:
+    description: build current project
+    commands: []
+
+  publish:
+    description: publish artifacts to registry
     commands: []
 
   test:
     description: run tests
+    commands: [go test]
+
+  end2end:
+    description: runs integration and end to end testing
     commands: []
 
-  lint:
-    description: run linting
-    commands: []
+  coverage:
+    description: run test coverage
+    commands:
+      - "go test -coverprofile coverage.out && go tool cover -func=coverage.out"
 
-  deploy:
-    description: deploy the current project
-    commands: []
+  pre-release:
+    description: bump patch version and release for deployment
+    commands:
+      - cgen bump --level pre-release
+      - git push --follow-tags --no-verify
+
+  patch-release:
+    description: bump patch version and release for deployment
+    commands:
+      - cgen bump --level patch
+      - git push --follow-tags --no-verify
+
+  minor-release:
+    description: bump minor version and release for deployment
+    commands:
+      - cgen bump --level minor
+      - git push --follow-tags --no-verify
+
+  upgrade:
+    description: upgrade the current project
+    commands: [cgen upgrade, yarn upgrade --latest]
+
+  oops:
+    description: undo last commit
+    commands: [git reset HEAD~1]
