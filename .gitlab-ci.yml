@@ -40,12 +40,14 @@ build:
   only: [/^v\d+.\d+.\d+/]
   except: [branches]
 
-publish_pre:
+pre-release:
   stage: publish
+  script: ["echo pre-release"]
   only: [/^v\d+.\d+.\d+/]
   except: [branches]
 
-publish:
+release:
   stage: publish
+  script: ["echo release"]
   only: [/^v\d+.\d+.\d+$/]
   except: [branches]
