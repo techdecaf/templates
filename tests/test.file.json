@@ -1,0 +1,7 @@
+{
+  "name": "testing",
+  "nested": {
+    "key": "value"
+  },
+  "array": [{ "foo": "bar" }]
+}
