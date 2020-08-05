@@ -50,13 +50,13 @@ tasks:
       - cgen bump --level pre-release
       - git push --follow-tags --no-verify
 
-  patch-release:
+  release-patch:
     description: bump patch version and release for deployment
     commands:
       - cgen bump --level patch
       - git push --follow-tags --no-verify
 
-  minor-release:
+  release-minor:
     description: bump minor version and release for deployment
     commands:
       - cgen bump --level minor
