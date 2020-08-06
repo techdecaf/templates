@@ -3,7 +3,7 @@
 # This file is a template, and might need editing before it works on your project.
 # Official framework image. Look for the different tagged releases at:
 # https://hub.docker.com/r/library/node/tags/
-image: golang:1.14-alpine
+image: golang:1.14-stretch
 
 # This folder is cached between builds
 # http://docs.gitlab.com/ce/ci/yaml/README.html#cache
@@ -24,7 +24,7 @@ stages: [test, build, publish]
 
 # runs before each job
 before_script:
-  - apk add git curl jq
+  # - apk add git curl jq
   - sh -c "$(curl -fsSL https://raw.github.com/techdecaf/tasks/master/install.sh)"
 
 test:
