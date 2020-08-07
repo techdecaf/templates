@@ -103,7 +103,7 @@ func (funcs *Functions) Init() error {
 		return out
   })
 
-  funcs.Add("JQ", func(input string, search string) interface{} {
+  funcs.Add("JQ", func(search string, input string) interface{} {
     out, err := JMESPath(input, search)
     if err != nil {
 			log.Fatal(err)

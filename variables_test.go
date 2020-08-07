@@ -73,7 +73,7 @@ func TestVariables(t *testing.T){
         // strings
         variables.Set(Variable{
           Key: "TEST_JQ_STRING_VAR",
-          Value: "{{JQ `{\"key\": {\"sub\": \"value\"}}` `key.sub` }}",
+          Value: "{{JQ `key.sub` `{\"key\": {\"sub\": \"value\"}}` }}",
         })
         // assert
         test.Assert(os.Getenv("TEST_JQ_STRING_VAR")).Equal("value")
@@ -81,7 +81,7 @@ func TestVariables(t *testing.T){
         // booleans
         variables.Set(Variable{
           Key: "TEST_JQ_BOOL_VAR",
-          Value: "{{JQ `{\"isTrue\": true}` `isTrue` }}",
+          Value: "{{JQ `isTrue` `{\"isTrue\": true}` }}",
         })
         // assert
         test.Assert(os.Getenv("TEST_JQ_BOOL_VAR")).Equal("true")
@@ -89,7 +89,7 @@ func TestVariables(t *testing.T){
         // numbers
         variables.Set(Variable{
           Key: "TEST_JQ_FLOAT_VAR",
-          Value: "{{JQ `{\"isTrue\": 32.1337}` `isTrue` }}",
+          Value: "{{JQ `isTrue` `{\"isTrue\": 32.1337}` }}",
         })
         // assert
         test.Assert(os.Getenv("TEST_JQ_FLOAT_VAR")).Equal("32.1337")
