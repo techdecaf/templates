@@ -95,6 +95,24 @@ func TestVariables(t *testing.T){
         test.Assert(os.Getenv("TEST_JQ_FLOAT_VAR")).Equal("32.1337")
       })
 
+      test.It("then: it should expand to the current working directory", func(){
+        variables := Variables{}
+        variables.Init()
+        // full current working directory
+        variables.Set(Variable{
+          Key: "TEST_CWD_VAR",
+          Value: "{{PWD}}",
+        })
+        test.Assert(strings.HasSuffix(os.Getenv("TEST_CWD_VAR"), "/templates")).Equal(true)
+
+        // use base to pull out base path only
+        variables.Set(Variable{
+          Key: "TEST_CWD_BASE_PATH",
+          Value: "{{PWD | base}}",
+        })
+        test.Assert(os.Getenv("TEST_CWD_BASE_PATH")).Equal("templates")
+      })
+
       test.It("then: it should expand variables in files", func(){
         variables := Variables{}
         variables.Init()

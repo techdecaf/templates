@@ -23,7 +23,14 @@ func (funcs *Functions) Init() error {
 	funcs.Map = sprig.TxtFuncMap()
 
 	funcs.Add("OS", func() string { return runtime.GOOS })
-	funcs.Add("ARCH", func() string { return runtime.GOARCH })
+  funcs.Add("ARCH", func() string { return runtime.GOARCH })
+  funcs.Add("PWD", func()string {
+    path, err := os.Getwd()
+    if err != nil {
+			log.Fatal(err)
+		}
+    return path
+   })
 
 	funcs.Add("FromSlash", filepath.FromSlash)
 	funcs.Add("ToSlash", filepath.ToSlash)
