@@ -5,6 +5,7 @@
     - [Operating System Helpers](#operating-system-helpers)
     - [File and Path Functions](#file-and-path-functions)
     - [String Functions](#string-functions)
+    - [Execution Functions](#execution-functions)
 
 ## Examples
 
@@ -29,3 +30,11 @@
 - ToUpper `{{ToUpper}}` uses go function `strings.ToUpper`
 - ToLower `{{ToLower}}` uses go function `strings.ToLower`
 - Replace `{{Replace}}` uses go function `strings.Replace`
+
+### Execution Functions
+
+- EXEC `{{EXEC 'echo hello'}}`
+- TRY `{{TRY 'fails' | default 'default value'}}`
+- Expand `{{Expand}}`
+- ExpandFile `{{ExpandFile}}`
+- JQ `{{JQ 'key.value[0]', '{"key": {"value":[1]} }'}}` === "1"
