@@ -94,7 +94,15 @@ func (funcs *Functions) Init() error {
 	funcs.Add("ExpandFile", func(file string) string {
 		out, _ := ExpandFile(file, *funcs)
 		return out
-	})
+  })
+
+  funcs.Add("JQ", func(input string, search string) interface{} {
+    out, err := JMESPath(input, search)
+    if err != nil {
+			log.Fatal(err)
+		}
+    return out
+  })
 
 	return nil
 }

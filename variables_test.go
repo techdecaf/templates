@@ -24,7 +24,7 @@ func TestVariables(t *testing.T){
         os.Setenv(shouldNotOverride.Key, "set_in_env")
         variables.Set(shouldNotOverride)
         // assert
-        test.Assert(os.Getenv("TEST_OVERRIDE_VAR")).Equal("set_in_env")	
+        test.Assert(os.Getenv("TEST_OVERRIDE_VAR")).Equal("set_in_env")
       })
     })
 
@@ -40,7 +40,7 @@ func TestVariables(t *testing.T){
         os.Setenv(shouldNotOverride.Key, "set_in_env")
         variables.Set(shouldNotOverride)
         // assert
-        test.Assert(os.Getenv("TEST_OVERRIDE_VAR")).Equal("should_overwrite")	
+        test.Assert(os.Getenv("TEST_OVERRIDE_VAR")).Equal("should_overwrite")
       })
     })
 
@@ -65,6 +65,34 @@ func TestVariables(t *testing.T){
         })
         // assert
         test.Assert(os.Getenv("TEST_TRY_VAR")).Equal("default_value")
+      })
+
+      test.It("then: it should find and set json sub properties using JQ", func(){
+        variables := Variables{}
+        variables.Init()
+        // strings
+        variables.Set(Variable{
+          Key: "TEST_JQ_STRING_VAR",
+          Value: "{{JQ `{\"key\": {\"sub\": \"value\"}}` `key.sub` }}",
+        })
+        // assert
+        test.Assert(os.Getenv("TEST_JQ_STRING_VAR")).Equal("value")
+
+        // booleans
+        variables.Set(Variable{
+          Key: "TEST_JQ_BOOL_VAR",
+          Value: "{{JQ `{\"isTrue\": true}` `isTrue` }}",
+        })
+        // assert
+        test.Assert(os.Getenv("TEST_JQ_BOOL_VAR")).Equal("true")
+
+        // numbers
+        variables.Set(Variable{
+          Key: "TEST_JQ_FLOAT_VAR",
+          Value: "{{JQ `{\"isTrue\": 32.1337}` `isTrue` }}",
+        })
+        // assert
+        test.Assert(os.Getenv("TEST_JQ_FLOAT_VAR")).Equal("32.1337")
       })
 
       test.It("then: it should expand variables in files", func(){
