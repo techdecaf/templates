@@ -104,7 +104,15 @@ func (funcs *Functions) Init() error {
   })
 
   funcs.Add("JQ", func(search string, input string) interface{} {
-    out, err := JMESPath(input, search)
+    out, err := SearchJSON(input, search)
+    if err != nil {
+			log.Fatal(err)
+		}
+    return out
+  })
+
+  funcs.Add("YQ", func(search string, input string) interface{} {
+    out, err := SearchYAML(input, search)
     if err != nil {
 			log.Fatal(err)
 		}

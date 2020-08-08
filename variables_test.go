@@ -67,6 +67,25 @@ func TestVariables(t *testing.T){
         test.Assert(os.Getenv("TEST_TRY_VAR")).Equal("default_value")
       })
 
+      test.It("then: it should find and set yaml sub properties using YQ", func(){
+        variables := Variables{}
+        variables.Init()
+
+        variables.Set(Variable{
+          Key: "VALID_YAML",
+          // NOTE: validYAML is a const in jmespath_test.go
+          Value: validYAML,
+        })
+
+        variables.Set(Variable{
+          Key: "TEST_YQ_STRING_VAR",
+          Value: "{{YQ `goblin.color` .VALID_YAML }}",
+        })
+        // assert
+        test.Assert(os.Getenv("TEST_YQ_STRING_VAR")).Equal("green")
+
+      })
+
       test.It("then: it should find and set json sub properties using JQ", func(){
         variables := Variables{}
         variables.Init()
@@ -122,7 +141,7 @@ func TestVariables(t *testing.T){
         })
 
         // act
-        got, err := ExpandFile("tests/testfile.txt", variables.Functions)
+        got, err := ExpandFile("test/data/testfile.txt", variables.Functions)
         if err != nil {
           t.Errorf("failed to expand file %v", err)
         }
