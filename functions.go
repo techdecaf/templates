@@ -1,6 +1,7 @@
 package templates
 
 import (
+	"fmt"
 	"io/ioutil"
 	"log"
 	"os"
@@ -13,9 +14,14 @@ import (
 	"github.com/techdecaf/templates/internal"
 )
 
-// Functions struct
+// Functions template function map
 type Functions struct {
 	Map template.FuncMap
+}
+
+// Add functions to the global template functions list.
+func (funcs *Functions) Add(key string, action interface{}) {
+	funcs.Map[key] = action
 }
 
 // Init adds all default functions to the Map
@@ -32,7 +38,8 @@ func (funcs *Functions) Init() error {
     return path
    })
 
-	funcs.Add("FromSlash", filepath.FromSlash)
+  // string manipulation
+
 	funcs.Add("ToSlash", filepath.ToSlash)
 	funcs.Add("ToTitle", strings.Title)
 	funcs.Add("ToUpper", strings.ToUpper)
@@ -40,15 +47,18 @@ func (funcs *Functions) Init() error {
 	funcs.Add("Replace", strings.Replace)
 
 	funcs.Add("CatLines", func(s string) string {
-		s = strings.Replace(s, "\r\n", " ", -1)
+    s = strings.Replace(s, "\r\n", " ", -1)
 		return strings.Replace(s, "\n", " ", -1)
 	})
 
 	funcs.Add("SplitLines", func(s string) []string {
-		return strings.Split(strings.Replace(s, "\r\n", "\n", -1), "\n")
+    return strings.Split(strings.Replace(s, "\r\n", "\n", -1), "\n")
 	})
 
-	funcs.Add("ReadFile", func(file string) string {
+  // file system operations
+  funcs.Add("FromSlash", filepath.FromSlash)
+
+  funcs.Add("ReadFile", func(file string) string {
 		data, _ := ioutil.ReadFile(internal.PathTo(file))
 		return string(data)
 	})
@@ -58,12 +68,28 @@ func (funcs *Functions) Init() error {
 	funcs.Add("MkdirAll", func(file string) (err error) {
 		err = os.MkdirAll(internal.PathTo(file), 0700)
 		return err
+  })
+
+	funcs.Add("RemoveAll", func(files ...string) (err error) {
+    for _, file := range files {
+      if err = os.RemoveAll(internal.PathTo(file)); err != nil {
+        return err
+      }
+    }
+		return err
+  })
+
+  funcs.Add("Expand", func(str string) string {
+		out, _ := Expand(str, *funcs)
+		return out
 	})
 
 	funcs.Add("Touch", func(file string) (err error) {
 		_, err = os.Create(internal.PathTo(file))
 		return err
 	})
+
+  // execution functions
 
 	funcs.Add("EXEC", func(cmd string) string {
 		output, err := Run(CommandOptions{
@@ -93,20 +119,18 @@ func (funcs *Functions) Init() error {
 		return output
 	})
 
-	funcs.Add("Expand", func(str string) string {
-		out, _ := Expand(str, *funcs)
-		return out
-	})
+
 
 	funcs.Add("ExpandFile", func(file string) string {
 		out, _ := ExpandFile(file, *funcs)
 		return out
   })
 
+  // serialization functions
   funcs.Add("JQ", func(search string, input string) interface{} {
     out, err := SearchJSON(input, search)
     if err != nil {
-			log.Fatal(err)
+      log.Fatal(fmt.Sprintf("JQ failed, %v", err))
 		}
     return out
   })
@@ -114,15 +138,10 @@ func (funcs *Functions) Init() error {
   funcs.Add("YQ", func(search string, input string) interface{} {
     out, err := SearchYAML(input, search)
     if err != nil {
-			log.Fatal(err)
+			log.Fatal(fmt.Sprintf("YQ failed, %v", err))
 		}
     return out
   })
 
 	return nil
-}
-
-// Add functions to the global template functions list.
-func (funcs *Functions) Add(key string, action interface{}) {
-	funcs.Map[key] = action
 }
