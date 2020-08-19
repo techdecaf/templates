@@ -6,6 +6,12 @@
     - [File and Path Functions](#file-and-path-functions)
     - [String Functions](#string-functions)
     - [Execution Functions](#execution-functions)
+      - [EXEC](#exec)
+      - [TRY](#try)
+      - [Expand](#expand)
+      - [ExpandFile](#expandfile)
+      - [JQ](#jq)
+      - [YQ](#yq)
 
 ## Examples
 
@@ -17,10 +23,11 @@
 ### File and Path Functions
 
 - PWD `{{PWD}}` resolves to current working directory
-- FromSlash `{{FromSlash}}` `filepath.FromSlash`
-- ToSlash `{{ToSlash}}` `filepath.ToSlash`
+- FromSlash `{{FromSlash}}` uses go function `filepath.FromSlash`
+- ToSlash `{{ToSlash}}` uses go function `filepath.ToSlash`
 - ReadFile `{{ReadFile}}` read file contents, supports relative or absolute paths.
 - WriteFile `{{WriteFile 'file/path' 'string data'}}` write file contents, supports relative or absolute paths.
+- RemoveAll `{{RemoveAll 'file/path'}}` **CAUTION** removes file or folder and all children
 - MkdirAll `{{MkdirAll}}`
 - Touch `{{Touch}}`
 
@@ -33,8 +40,42 @@
 
 ### Execution Functions
 
-- EXEC `{{EXEC 'echo hello'}}`
-- TRY `{{TRY 'fails' | default 'default value'}}`
-- Expand `{{Expand}}`
-- ExpandFile `{{ExpandFile}}`
-- JQ `{{JQ 'key.value[0]', '{"key": {"value":[1]} }'}}` === "1"
+#### EXEC
+
+```text
+{{EXEC `echo "hello"`}}
+```
+
+#### TRY
+
+```text
+{{TRY `fails` | default `default value`}}
+```
+
+#### Expand
+
+```text
+{{Expand}}
+```
+
+#### ExpandFile
+
+```text
+{{ReadFile `my-template-file.yaml` | ExpandFile | WriteFile}}
+```
+
+#### JQ
+
+```text
+{{JQ 'key.value[0]', '{"key": {"value":[1]} }'}}
+```
+
+```text
+{{ReadFile `my-file.json` | JQ `key.value[0]`}}
+```
+
+#### YQ
+
+```text
+{{ReadFile `my-file.yaml` | YQ `key.value[0]`}}
+```
