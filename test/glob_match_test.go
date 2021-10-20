@@ -6,7 +6,6 @@ import (
 
 	. "github.com/franela/goblin"
 	"github.com/techdecaf/templates"
-	"github.com/techdecaf/templates/internal"
 )
 
 func TestGlobMatch(t *testing.T) {
@@ -19,11 +18,7 @@ func TestGlobMatch(t *testing.T) {
 				files, err := templates.GlobMatch("./data/", "**/*.ext")
 				// check for any error result
 
-				expected := []string{
-					internal.PathTo("./data/glob_match/match_1.ext"),
-					internal.PathTo("./data/glob_match/match_2.ext"),
-				}
-				test.Assert(strings.Join(files, "|")).Equal(strings.Join(expected, "|"))
+				test.Assert(strings.Join(files, "|")).Equal("glob_match/match_1.ext|glob_match/match_2.ext")
 				test.Assert(err).Equal(nil)
 			})
 		})
@@ -36,7 +31,7 @@ func TestGlobMatch(t *testing.T) {
 			funcs.Init()
 			content, err := templates.ExpandFile("./data/glob_match.test.txt", funcs)
 
-			test.Assert(content).Equal(internal.PathTo("./data/glob_match.test.txt"))
+			test.Assert(content).Equal("glob_match.test.txt")
 			test.Assert(err).Equal(nil)
 		})
 	})
