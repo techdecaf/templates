@@ -33,7 +33,7 @@ tasks:
 
   test:
     description: run tests
-    commands: [go test]
+    commands: [go test ./test]
 
   end2end:
     description: runs integration and end to end testing
