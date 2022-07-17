@@ -13,7 +13,7 @@ func SearchJSON(input string, search string) (data interface{}, err error) {
 		return "", err
 	}
 	result, err := jmespath.Search(search, data)
-	if (err != nil){
+	if err != nil {
 		return "", err
 	}
 
@@ -21,10 +21,10 @@ func SearchJSON(input string, search string) (data interface{}, err error) {
 }
 
 // SearchYAML converts yaml to JSON and runs a jmespath search
-func SearchYAML(input string, search string) (data interface{}, err error)  {
-  rawJSON, err := yaml.YAMLToJSON([]byte(input))
-  if err != nil {
-    return nil, err
-  }
-  return SearchJSON(string(rawJSON), search)
+func SearchYAML(input string, search string) (data interface{}, err error) {
+	rawJSON, err := yaml.YAMLToJSON([]byte(input))
+	if err != nil {
+		return nil, err
+	}
+	return SearchJSON(string(rawJSON), search)
 }
